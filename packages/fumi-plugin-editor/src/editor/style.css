@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@source "index.html";
+
+@theme {
+  --font-mono: "Fira Code", "Cascadia Code", "Consolas", ui-monospace, monospace;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}

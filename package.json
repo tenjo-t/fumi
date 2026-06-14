@@ -1,0 +1,17 @@
+{
+  "name": "@tenjot/fumi-workspace",
+  "private": true,
+  "license": "MIT",
+  "author": "tenjo-t",
+  "scripts": {
+    "dev": "pnpm -F \"./packages/**\" run build && pnpm -F docs run dev",
+    "build": "pnpm -F \"./packages/**\" run build && pnpm -F docs run build",
+    "preview": "pnpm -F docs run preview"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.51.0",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:"
+  }
+}

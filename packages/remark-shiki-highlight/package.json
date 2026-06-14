@@ -1,0 +1,35 @@
+{
+  "name": "@tenjot/remark-shiki-highlight",
+  "version": "0.1.0",
+  "description": "Syntax highlighter",
+  "license": "MIT",
+  "author": "tenjo-t",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "tsdown -w",
+    "build": "tsdown"
+  },
+  "dependencies": {
+    "shiki": "^4.0.2",
+    "unist-util-visit": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/hast": "catalog:",
+    "@types/mdast": "^4.0.4",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "unified": "catalog:"
+  }
+}

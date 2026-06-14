@@ -1,0 +1,30 @@
+{
+  "name": "@tenjot/fumi-theme-docs",
+  "version": "0.1.0",
+  "description": "fumi default theme for docs",
+  "license": "MIT",
+  "author": "tenjo-t",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {
+    "tsdown": "catalog:"
+  },
+  "peerDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@tenjot/fumi": "workspace:*",
+    "tailwindcss": "catalog:"
+  }
+}

@@ -1,0 +1,145 @@
+declare module "@app" {
+  import type { Component } from "vue";
+  const app: Component;
+  export default app;
+}
+
+declare module "@data" {
+  import type { SiteData } from "@tenjot/fumi";
+
+  const data: SiteData;
+  export default data;
+}
+
+// Navigation API type definitions
+// https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API
+
+interface NavigationHistoryEntry extends EventTarget {
+  readonly url: string | null;
+  readonly key: string;
+  readonly id: string;
+  readonly index: number;
+  readonly sameDocument: boolean;
+  getState(): unknown;
+  addEventListener(
+    type: "dispose",
+    listener: (event: Event) => void,
+    options?: AddEventListenerOptions,
+  ): void;
+  removeEventListener(
+    type: "dispose",
+    listener: (event: Event) => void,
+    options?: EventListenerOptions,
+  ): void;
+}
+
+interface NavigationDestination {
+  readonly url: string;
+  readonly key: string;
+  readonly id: string;
+  readonly index: number;
+  readonly sameDocument: boolean;
+  getState(): unknown;
+}
+
+interface NavigateEvent extends Event {
+  readonly navigationType: "push" | "replace" | "reload" | "traverse";
+  readonly destination: NavigationDestination;
+  readonly canIntercept: boolean;
+  readonly userInitiated: boolean;
+  readonly hashChange: boolean;
+  readonly signal: AbortSignal;
+  readonly formData: FormData | null;
+  readonly downloadRequest: string | null;
+  readonly info: unknown;
+  readonly hasUAVisualTransition: boolean;
+  intercept(options?: NavigationInterceptOptions): void;
+  scroll(): void;
+}
+
+interface NavigationCurrentEntryChangeEvent extends Event {
+  readonly navigationType: "push" | "replace" | "reload" | "traverse" | null;
+  readonly from: NavigationHistoryEntry;
+}
+
+interface NavigationInterceptOptions {
+  handler?: () => Promise<void>;
+  precommitHandler?: () => Promise<void>;
+  focusReset?: "after-transition" | "manual";
+  scroll?: "after-transition" | "manual";
+}
+
+interface NavigationResult {
+  committed: Promise<NavigationHistoryEntry>;
+  finished: Promise<NavigationHistoryEntry>;
+}
+
+interface NavigationNavigateOptions {
+  state?: unknown;
+  history?: "auto" | "push" | "replace";
+  info?: unknown;
+}
+
+interface Navigation extends EventTarget {
+  readonly currentEntry: NavigationHistoryEntry | null;
+  readonly transition: NavigationTransition | null;
+  readonly canGoBack: boolean;
+  readonly canGoForward: boolean;
+  entries(): NavigationHistoryEntry[];
+  navigate(url: string, options?: NavigationNavigateOptions): NavigationResult;
+  reload(options?: NavigationReloadOptions): NavigationResult;
+  traverseTo(key: string, options?: NavigationOptions): NavigationResult;
+  back(options?: NavigationOptions): NavigationResult;
+  forward(options?: NavigationOptions): NavigationResult;
+  updateCurrentEntry(options: NavigationUpdateCurrentEntryOptions): void;
+  addEventListener(
+    type: "navigate",
+    listener: (event: NavigateEvent) => void,
+    options?: AddEventListenerOptions,
+  ): void;
+  addEventListener(
+    type: "currententrychange",
+    listener: (event: NavigationCurrentEntryChangeEvent) => void,
+    options?: AddEventListenerOptions,
+  ): void;
+  addEventListener(
+    type: "navigatesuccess" | "navigateerror",
+    listener: (event: Event) => void,
+    options?: AddEventListenerOptions,
+  ): void;
+  removeEventListener(
+    type: "navigate",
+    listener: (event: NavigateEvent) => void,
+    options?: EventListenerOptions,
+  ): void;
+  removeEventListener(
+    type: "currententrychange",
+    listener: (event: NavigationCurrentEntryChangeEvent) => void,
+    options?: EventListenerOptions,
+  ): void;
+  removeEventListener(
+    type: "navigatesuccess" | "navigateerror",
+    listener: (event: Event) => void,
+    options?: EventListenerOptions,
+  ): void;
+}
+
+interface NavigationTransition {
+  readonly navigationType: "push" | "replace" | "reload" | "traverse";
+  readonly from: NavigationHistoryEntry;
+  readonly finished: Promise<void>;
+}
+
+interface NavigationOptions {
+  info?: unknown;
+}
+
+interface NavigationReloadOptions extends NavigationOptions {
+  state?: unknown;
+}
+
+interface NavigationUpdateCurrentEntryOptions {
+  state: unknown;
+}
+
+declare const navigation: Navigation;

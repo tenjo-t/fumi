@@ -1,0 +1,68 @@
+{
+  "name": "@tenjot/fumi",
+  "version": "0.1.0",
+  "description": "A static site generator for Vue + remark",
+  "license": "MIT",
+  "author": "tenjo-t",
+  "type": "module",
+  "imports": {
+    "#editor/*": "./dist/editor/*"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    },
+    "./client": {
+      "default": "./dist/client.mjs",
+      "types": "./dist/client.d.mts"
+    },
+    "./main": {
+      "default": "./dist/main.mjs",
+      "types": "./dist/main.d.mts"
+    },
+    "./ssr": {
+      "default": "./dist/ssr.mjs",
+      "types": "./dist/ssr.d.mts"
+    },
+    "./ssr.mjs": {
+      "default": "./dist/ssr.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsdown -w",
+    "build": "tsdown"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@types/node": "^25.4.0",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "gray-matter": "^4.0.3",
+    "hast-util-select": "catalog:",
+    "hast-util-to-html": "catalog:",
+    "hast-util-to-text": "catalog:",
+    "picomatch": "^4.0.4",
+    "rehype-stringify": "^10.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.1",
+    "tinyglobby": "^0.2.15",
+    "unified": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/hast": "catalog:",
+    "@types/picomatch": "^4.0.2",
+    "tailwindcss": "^4.3.0",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "unplugin-vue": "^7.1.1",
+    "vue-tsc": "^3.2.5"
+  }
+}

@@ -1,0 +1,3 @@
+# MarkdownでVueを使う
+
+Fumiでは、各MarkdownファイルはまずHTMLにコンパイルされ、その後Vueのコンポーネントとして処理されます。

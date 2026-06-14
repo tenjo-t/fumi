@@ -1,0 +1,19 @@
+{
+  "name": "docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --app",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@tenjot/fumi": "workspace:*",
+    "@tenjot/fumi-plugin-editor": "workspace:*",
+    "@tenjot/remark-shiki-highlight": "workspace:*",
+    "tailwindcss": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:"
+  }
+}

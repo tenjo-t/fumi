@@ -1,0 +1,34 @@
+{
+  "name": "@tenjot/fumi-plugin-editor",
+  "version": "0.1.0",
+  "description": "",
+  "license": "MIT",
+  "author": "tenjo-t",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "imports": {
+    "#editor/*": "./dist/editor/*"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "tsdown -w & vite build -w",
+    "build": "tsdown && vite build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "tailwindcss": "catalog:",
+    "tsdown": "catalog:"
+  }
+}
