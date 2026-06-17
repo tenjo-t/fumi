@@ -1,6 +1,11 @@
+import { join, resolve } from "node:path";
 import type hast from "hast";
 import { toHtml } from "hast-util-to-html";
 import type { HeadConfig } from "./config";
+import { fileURLToPath } from "node:url";
+
+export const ROOT = resolve(fileURLToPath(import.meta.url), "..");
+export const APP = join(ROOT, "main.mjs");
 
 function headConfigToHast(head: HeadConfig[]): hast.Element[] {
   return head.map(([tagName, a, c]) => {

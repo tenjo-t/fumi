@@ -3,7 +3,6 @@ import { readdirSync, writeFileSync, mkdirSync, rmSync } from "fs";
 import { readFile } from "fs/promises";
 import { resolve, relative, dirname, extname } from "path";
 import { pathToPageComponentPath } from "../client/router";
-import type { FumiConfig } from "../config";
 import { configToHeadConfig } from "../client/config";
 import { headConfigStringify } from "../utils";
 
@@ -52,12 +51,7 @@ function urlToOutPath(outDir: string, url: string): string {
   return resolve(outDir, url.slice(1) + ".html");
 }
 
-function urlToHtmlPath(url: string): string {
-  return url === "/" ? "index.html" : `${url.slice(1)}.html`;
-}
-
-export function build(config: FumiConfig): Plugin {
-  let ssrEntryPath: string | null = null;
+export function build(): Plugin {
   let outDir: string;
 
   return {

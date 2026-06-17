@@ -1,9 +1,12 @@
 {
   "name": "@tenjot/fumi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A static site generator for Vue + remark",
   "license": "MIT",
   "author": "tenjo-t",
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "imports": {
     "#editor/*": "./dist/editor/*"
@@ -29,15 +32,12 @@
       "default": "./dist/ssr.mjs"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "tsdown -w",
     "build": "tsdown"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "dependencies": {
     "@types/node": "^25.4.0",

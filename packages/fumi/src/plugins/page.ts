@@ -1,9 +1,8 @@
 import type { Plugin } from "vite";
 import { statSync } from "fs";
 import { resolve } from "path";
-import type { FumiConfig } from "../config";
 
-export function page(config: FumiConfig): Plugin[] {
+export function page(): Plugin[] {
   let root: string;
   return [
     {

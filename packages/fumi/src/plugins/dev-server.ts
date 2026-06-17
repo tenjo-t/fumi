@@ -8,7 +8,7 @@ import {
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import { pathToPageComponentPath } from "../client/router";
-import type { FumiConfig, HeadConfig } from "../config";
+import type { HeadConfig } from "../config";
 import { configToHeadConfig } from "../client/config";
 import { headConfigStringify } from "../utils";
 
@@ -17,18 +17,18 @@ const isCss = createFilter(
   [/[?&](?:worker|sharedworker|raw|url)\b/, /[?&]commonjs-proxy/],
 );
 
-export function devServer(config: FumiConfig): Plugin {
+export function devServer(): Plugin {
   return {
     name: "fumi:dev-server",
     apply: "serve",
 
     configureServer(server) {
-      return dev(server, config);
+      return dev(server);
     },
   };
 }
 
-async function dev(server: ViteDevServer, config: FumiConfig) {
+async function dev(server: ViteDevServer) {
   const root = server.config.root;
   const fumiRoot = resolve(root, ".fumi");
 
@@ -43,6 +43,7 @@ async function dev(server: ViteDevServer, config: FumiConfig) {
         if (url.endsWith(".map")) return next();
         if (url === "/favicon.ico") return next();
         if (url.startsWith("/__app/")) return next();
+        if (url.startsWith("/@")) return next();
 
         let html = readFileSync(resolve(fumiRoot, "index.html"), "utf-8");
         html = await server.transformIndexHtml(url, html);

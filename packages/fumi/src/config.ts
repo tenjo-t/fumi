@@ -6,6 +6,7 @@ import { dataLoader } from "./plugins/data-loader";
 import { devServer } from "./plugins/dev-server";
 import { markdown, type MarkdownOptions } from "./plugins/markdown";
 import { page } from "./plugins/page";
+import { client } from "./plugins/client";
 
 export type HeadConfig =
   | [tag: string, attr: Record<string, string>]
@@ -54,9 +55,10 @@ export function defineConfig(userConfig: FumiUserConfig = {}) {
     ...viteUserConfig,
     plugins: [
       vue(vueOptions),
-      devServer(fumiConfig),
-      build(fumiConfig),
-      page(fumiConfig),
+      client(),
+      devServer(),
+      build(),
+      page(),
       markdown(markdownOptions, fumiConfig),
       dataLoader(markdownOptions, fumiConfig),
       ...(viteUserConfig.plugins ?? []),
