@@ -1,5 +1,4 @@
-import { resolve } from "path";
-import { default as vue, Options as VueOptions } from "@vitejs/plugin-vue";
+import { default as vue, type Options as VueOptions } from "@vitejs/plugin-vue";
 import { defineConfig as viteDefineConfig, type UserConfig as ViteUserConfig } from "vite";
 import { build } from "./plugins/build";
 import { dataLoader } from "./plugins/data-loader";
@@ -50,7 +49,6 @@ export function defineConfig(userConfig: FumiUserConfig = {}) {
     markdown: markdownOptions = {},
     ...fumiConfig
   } = userConfig;
-  const cwd = process.cwd();
   return viteDefineConfig({
     ...viteUserConfig,
     plugins: [
@@ -63,13 +61,6 @@ export function defineConfig(userConfig: FumiUserConfig = {}) {
       dataLoader(markdownOptions, fumiConfig),
       ...(viteUserConfig.plugins ?? []),
     ],
-    resolve: {
-      ...viteUserConfig.resolve,
-      alias: {
-        ...viteUserConfig.resolve?.alias,
-        "@app": resolve(cwd, ".fumi/App.vue"),
-      },
-    },
   });
 }
 

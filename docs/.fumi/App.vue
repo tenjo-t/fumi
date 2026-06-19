@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Content, useData } from "@tenjot/fumi/client";
+import { useData } from "@tenjot/fumi/client";
 import Header from "./components/Header.vue";
 import Home from "./components/Home.vue";
 import Doc from "./components/Doc.vue";

@@ -93,7 +93,7 @@ export function build(): Plugin {
             emptyOutDir: false,
             rolldownOptions: {
               input: {
-                ssr: "@tenjot/fumi/ssr",
+                app: ".fumi/App.vue",
                 ...Object.fromEntries(
                   pages.map(({ url }) => [urlToInputKey(url), `/${urlToInputKey(url)}.js`]),
                 ),
@@ -128,8 +128,8 @@ export function build(): Plugin {
       const templatePath = resolve(ssrOutDir, "index.html");
       const template = await readFile(templatePath, "utf-8");
 
-      const ssrModule = resolve(ssrOutDir, "ssr.js");
-      const { render } = await import(/* @vite-ignore */ ssrModule + `?t=${Date.now()}`);
+      const { render } = await import("#ssr");
+      const { default: root } = await import(resolve(ssrOutDir, "app.js"));
 
       console.log("\nRendering pages...");
       for (const { url } of pages) {
@@ -137,7 +137,7 @@ export function build(): Plugin {
         const { default: component, __pageData: data } = await import(
           /* @vite-ignore */ pageComponentPath
         );
-        const appHtml = await render(url, component, data);
+        const appHtml = await render(root, url, component, data);
         if (appHtml === null) {
           console.log(`  skip ${url}`);
           continue;

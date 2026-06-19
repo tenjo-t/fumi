@@ -9,7 +9,7 @@
   ],
   "type": "module",
   "imports": {
-    "#editor/*": "./dist/editor/*"
+    "#ssr": "./dist/ssr.mjs"
   },
   "exports": {
     ".": {
@@ -19,17 +19,6 @@
     "./client": {
       "default": "./dist/client.mjs",
       "types": "./dist/client.d.mts"
-    },
-    "./main": {
-      "default": "./dist/main.mjs",
-      "types": "./dist/main.d.mts"
-    },
-    "./ssr": {
-      "default": "./dist/ssr.mjs",
-      "types": "./dist/ssr.d.mts"
-    },
-    "./ssr.mjs": {
-      "default": "./dist/ssr.mjs"
     }
   },
   "publishConfig": {

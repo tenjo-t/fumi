@@ -9,6 +9,9 @@ export default defineConfig({
   description: "A static site generator for Vue + remark",
   vite: {
     plugins: [editor(), tailwindcss()],
+    ssr: {
+      external: ["@tenjot/fumi"],
+    },
   },
   markdown: {
     remarkPlugins: [[remarkShikiHighlight, { theme: "catppuccin-mocha" }]],

@@ -48,7 +48,9 @@ async function dev(server: ViteDevServer) {
         let html = readFileSync(resolve(fumiRoot, "index.html"), "utf-8");
         html = await server.transformIndexHtml(url, html);
 
-        const { render } = await ssrEnv.runner.import("@tenjot/fumi/ssr");
+        const { render } = await import("#ssr");
+        const { default: root } = await ssrEnv.runner.import(".fumi/App.vue");
+
         const pageComponentPath = pathToPageComponentPath(url);
         const { default: component, __pageData } = await ssrEnv.runner
           .import(pageComponentPath)
@@ -61,7 +63,7 @@ async function dev(server: ViteDevServer) {
               __pageData: { ...page?.__pageData, path: url, isNotFound: true },
             };
           });
-        const appHtml = await render(url, component, __pageData);
+        const appHtml = await render(root, url, component, __pageData);
         if (appHtml === null) return next();
 
         const pageMod = await clientEnv.moduleGraph.getModuleByUrl("/.fumi/App.vue");
