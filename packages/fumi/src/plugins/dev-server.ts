@@ -40,13 +40,23 @@ async function dev(server: ViteDevServer) {
       try {
         const url = req.originalUrl ?? req.url ?? "/";
 
-        if (url.endsWith(".map")) return next();
-        if (url === "/favicon.ico") return next();
-        if (url.startsWith("/__app/")) return next();
-        if (url.startsWith("/@")) return next();
+        // HTMLページのナビゲーションリクエストのみを処理し、
+        // CSS・JS・Vue などのモジュール/アセットリクエストは Vite に委ねる。
+        // （横取りすると transformIndexHtml に非HTMLパスが渡り、
+        //  インラインスクリプトが不正な html-proxy モジュールに化ける）
+        if (req.method !== "GET") return next();
+        if (!req.headers.accept?.includes("text/html")) return next();
+        // `.html` 以外の拡張子を持つパス（.css/.js/.vue など）はアセット/モジュール
+        // リクエストなので Vite に委ねる。拡張子なし or `.html` はページとして扱う。
+        const pathname = url.split("?")[0];
+        const ext = pathname.slice(pathname.lastIndexOf("/") + 1).match(/\.[^.]+$/)?.[0];
+        if (ext && ext !== ".html") return next();
 
         let html = readFileSync(resolve(fumiRoot, "index.html"), "utf-8");
-        html = await server.transformIndexHtml(url, html);
+        // index.html の実際の配信パスを htmlPath として渡すことで、
+        // `<link href="./style.css">` などの相対URLが `.fumi/` 基準で解決される。
+        // ページのルートは originalUrl（第3引数）で渡す。
+        html = await server.transformIndexHtml("/.fumi/index.html", html, url);
 
         const { render } = await import("#ssr");
         const { default: root } = await ssrEnv.runner.import(".fumi/App.vue");

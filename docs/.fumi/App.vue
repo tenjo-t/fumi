@@ -20,9 +20,3 @@ const { page } = useData();
     <footer class="p-4 text-sm text-center border-t border-taupe-300">© Tenjo, takashi</footer>
   </div>
 </template>
-
-<style>
-@import "tailwindcss";
-@source "index.html";
-@source "**/*.md";
-</style>
