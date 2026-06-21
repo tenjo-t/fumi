@@ -79,6 +79,7 @@ export function dataLoader(markdownOptions: MarkdownOptions, config: FumiConfig)
                 .replace(root, ""),
               isNotFound: false,
               ...resolvedConfig,
+              frontmatter,
             };
           });
         } else {

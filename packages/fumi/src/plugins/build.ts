@@ -6,7 +6,7 @@ import { pathToPageComponentPath } from "../client/router";
 import { configToHeadConfig } from "../client/config";
 import { headConfigStringify } from "../utils";
 
-const EXCLUDE_DIRS = new Set([".fumi", ".git", "dist", "node_modules", "packages", "public"]);
+const EXCLUDE_DIRS = new Set([".fumi", ".git", "dist", "node_modules", "public"]);
 
 interface PageEntry {
   url: string;
