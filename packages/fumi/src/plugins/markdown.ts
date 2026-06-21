@@ -56,10 +56,11 @@ export function markdown(options: MarkdownOptions, config: FumiConfig): Plugin {
           pageConfig.title = file.data.title as string;
         }
         const resolvedConfig = resolveFumiConfig(config, pageConfig);
+        const path = id.replace("index.md", "index.html").replace(".md", ".html").replace(root, "");
 
         const data: PageData = {
-          path: id.replace("index.md", "index.html").replace(".md", ".html").replace(root, ""),
-          isNotFound: false,
+          path,
+          isNotFound: path === "/404.html",
           frontmatter,
           ...resolvedConfig,
         };

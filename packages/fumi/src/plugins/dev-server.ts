@@ -67,7 +67,9 @@ async function dev(server: ViteDevServer) {
           .catch(async (e) => {
             if (e.code !== "ERR_LOAD_URL") throw e;
 
-            const page = await ssrEnv.runner.import("/__app/404.js").catch(() => undefined);
+            const page = await ssrEnv.runner
+              .import(/* @vite-ignore */ "/__app/404.js")
+              .catch(() => undefined);
             return {
               default: page?.default,
               __pageData: { ...page?.__pageData, path: url, isNotFound: true },
