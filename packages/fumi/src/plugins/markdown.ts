@@ -59,7 +59,7 @@ export function markdown(options: MarkdownOptions, config: FumiConfig): Plugin {
         const path = id.replace("index.md", "index.html").replace(".md", ".html").replace(root, "");
 
         const data: PageData = {
-          path,
+          path: config.rewrites?.(path) ?? path,
           isNotFound: path === "/404.html",
           frontmatter,
           ...resolvedConfig,

@@ -58,25 +58,25 @@ export function dataLoader(markdownOptions: MarkdownOptions, config: FumiConfig)
             await glob(loader.watch, {
               absolute: true,
               expandDirectories: true,
-              ignore: ["**/node_modules/**", "**/dist/**", "**/.fumi/**"],
+              ignore: ["**/node_modules/**", "**/.fumi/**"],
             })
           ).sort();
           const processor = createProcessor(markdownOptions);
-          data = await loader.load(watchFiles, async (path) => {
-            const src = await readFile(path, "utf-8");
+          data = await loader.load(watchFiles, async (file) => {
+            const src = await readFile(file, "utf-8");
             const { content, data: frontmatter } = matter(src);
-            const file = await processor.process(content);
+            const vfile = await processor.process(content);
 
             const pageConfig: FumiConfig = { ...frontmatter };
-            if (pageConfig.title == null && file.data.title != null) {
-              pageConfig.title = file.data.title as string;
+            if (pageConfig.title == null && vfile.data.title != null) {
+              pageConfig.title = vfile.data.title as string;
             }
             const resolvedConfig = resolveFumiConfig(config, pageConfig);
+
+            const path = file.replace(".md", ".html").replace(root, "");
+
             return {
-              path: path
-                .replace("index.md", "index.html")
-                .replace(".md", ".html")
-                .replace(root, ""),
+              path: config.rewrites?.(path) ?? path,
               isNotFound: false,
               ...resolvedConfig,
               frontmatter,

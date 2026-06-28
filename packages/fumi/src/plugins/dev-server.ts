@@ -8,32 +8,34 @@ import {
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import { pathToPageComponentPath } from "../client/router";
-import type { HeadConfig } from "../config";
+import type { HeadConfig, FumiConfig } from "../config";
 import { configToHeadConfig } from "../client/config";
 import { headConfigStringify } from "../utils";
+import { rewritesDevServer } from "../route";
 
 const isCss = createFilter(
   [/\.css(?:$|\?)/],
   [/[?&](?:worker|sharedworker|raw|url)\b/, /[?&]commonjs-proxy/],
 );
 
-export function devServer(): Plugin {
+export function devServer(config: FumiConfig): Plugin {
   return {
     name: "fumi:dev-server",
     apply: "serve",
 
-    configureServer(server) {
-      return dev(server);
+    async configureServer(server) {
+      return await dev(server, config);
     },
   };
 }
 
-async function dev(server: ViteDevServer) {
-  const root = server.config.root;
-  const fumiRoot = resolve(root, ".fumi");
+async function dev(server: ViteDevServer, config: FumiConfig) {
+  const fumiRoot = resolve(server.config.root, ".fumi");
 
   const ssrEnv = server.environments.ssr as RunnableDevEnvironment;
   const clientEnv = server.environments.client;
+
+  await rewritesDevServer(server, config.rewrites);
 
   return () => {
     server.middlewares.use(async (req, res, next) => {
@@ -72,7 +74,11 @@ async function dev(server: ViteDevServer) {
               .catch(() => undefined);
             return {
               default: page?.default,
-              __pageData: { ...page?.__pageData, path: url, isNotFound: true },
+              __pageData: {
+                ...page?.__pageData,
+                path: config.rewrites?.(url) ?? url,
+                isNotFound: true,
+              },
             };
           });
         const appHtml = await render(root, url, component, __pageData);

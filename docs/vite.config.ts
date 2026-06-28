@@ -7,6 +7,9 @@ export default defineConfig({
   title: "Fumi",
   titleTemplate: ":title | Fumi",
   description: "A static site generator for Vue + remark",
+  rewrites(path) {
+    return path.replace(/\/\d+\.(.*\.html$)/, "/$1");
+  },
   vite: {
     plugins: [editor(), tailwindcss()],
     ssr: {

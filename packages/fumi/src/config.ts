@@ -26,6 +26,8 @@ export interface FumiConfig {
   head?: HeadConfig[];
   /** サイトの言語属性 */
   lang?: string;
+  /** ディレクトリと URL のカスタム対応を定義。 */
+  rewrites?: (path: string) => string | undefined;
 }
 
 export interface ResolvedFumiConfig extends FumiConfig {
@@ -54,8 +56,8 @@ export function defineConfig(userConfig: FumiUserConfig = {}) {
     plugins: [
       vue(vueOptions),
       html(),
-      devServer(),
-      build(),
+      devServer(fumiConfig),
+      build(fumiConfig),
       page(),
       markdown(markdownOptions, fumiConfig),
       dataLoader(markdownOptions, fumiConfig),

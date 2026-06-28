@@ -4,7 +4,7 @@ const loader = defineLoader({
   watch: ["reference/*.md"],
   async load(watchFiles, loadMarkdown) {
     return await Promise.all(
-      watchFiles.map(async (path) => {
+      watchFiles.toSorted().map(async (path) => {
         const data = await loadMarkdown(path);
         return {
           title: data.title,
