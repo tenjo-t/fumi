@@ -26,7 +26,7 @@ export interface FumiConfig {
   head?: HeadConfig[];
   /** サイトの言語属性 */
   lang?: string;
-  /** ディレクトリと URL のカスタム対応を定義。 */
+  /** ディレクトリとURLのカスタム対応を定義。 */
   rewrites?: (path: string) => string | undefined;
 }
 

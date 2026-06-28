@@ -1,62 +1,18 @@
+import { writeFileSync, mkdirSync, rmSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { resolve, relative, dirname } from "node:path";
 import type { Plugin } from "vite";
-import { readdirSync, writeFileSync, mkdirSync, rmSync } from "fs";
-import { readFile } from "fs/promises";
-import { resolve, relative, dirname, extname } from "path";
 import { pathToPageComponentPath } from "../client/router";
 import { configToHeadConfig } from "../client/config";
 import { headConfigStringify } from "../utils";
 import type { FumiConfig } from "../config";
-import { Pages, resolvePages } from "../route";
-
-// const EXCLUDE_DIRS = new Set([".fumi", ".git", "dist", "node_modules", "public"]);
-
-// interface PageEntry {
-//   url: string;
-//   filePath: string;
-// }
-
-// function discoverPages(root: string, rewrites?: (path: string) => string): PageEntry[] {
-//   const pages: PageEntry[] = [];
-
-//   function walk(dir: string) {
-//     for (const entry of readdirSync(dir, { withFileTypes: true })) {
-//       if (entry.isDirectory()) {
-//         if (!EXCLUDE_DIRS.has(entry.name)) {
-//           walk(resolve(dir, entry.name));
-//         }
-//       } else if (entry.isFile()) {
-//         const ext = extname(entry.name);
-//         const isUpperCase =
-//           entry.name[0] === entry.name[0].toUpperCase() &&
-//           entry.name[0] !== entry.name[0].toLowerCase();
-//         if ((ext === ".md" || ext === ".vue") && !isUpperCase) {
-//           const filePath = resolve(dir, entry.name);
-//           const rel = relative(root, filePath).replace(/\\/g, "/");
-//           let url = "/" + rel.replace(/\.(md|vue)$/, "");
-//           if (url.endsWith("/index")) url = url.slice(0, -6) || "/";
-//           if (rewrites) url = rewrites(url);
-//           pages.push({ url, filePath });
-//         }
-//       }
-//     }
-//   }
-
-//   walk(root);
-//   return pages;
-// }
-
-function pathToInputKey(path: string): string {
-  return "__app" + path.replace(/\.html$/, "");
-}
-
-function pathToOutPath(outDir: string, url: string): string {
-  return resolve(outDir, url.slice(1));
-}
+import { collectPages, rewritePath } from "../route";
 
 export function build(config: FumiConfig): Plugin {
+  const rewrite = rewritePath.bind(null, config.rewrites);
   let cwd: string;
   let outDir: string;
-  let pages: Pages;
+  let pages: string[];
 
   return {
     name: "fumi:build",
@@ -64,14 +20,14 @@ export function build(config: FumiConfig): Plugin {
 
     async config(vite) {
       cwd = vite.root ?? process.cwd();
-      pages = await resolvePages(cwd, config.rewrites);
+      pages = await collectPages(cwd);
     },
 
     configEnvironment(name, config) {
       const input = Object.fromEntries(
-        pages.pages.map((p) => [
-          pathToInputKey(pages.rewrites.map[p] || p),
-          `/${pathToInputKey(p)}.js`,
+        pages.map((p) => [
+          pathToPageComponentPath(rewrite(p)).slice(1, -3),
+          pathToPageComponentPath(p),
         ]),
       );
 
@@ -138,27 +94,28 @@ export function build(config: FumiConfig): Plugin {
       const { default: root } = await import(resolve(ssrOutDir, "app.js"));
 
       console.log("\nRendering pages...");
-      for (const p of pages.pages) {
-        const path = pages.rewrites.map[p] || p;
-        const pageComponentPath = resolve(ssrOutDir, `.${pathToPageComponentPath(path)}`);
+      for (const p of pages) {
+        const path = rewrite(p);
+        const mdPath = path.replace(/\.html$/, ".md");
+
         const { default: component, __pageData: data } = await import(
-          /* @vite-ignore */ pageComponentPath
+          /* @vite-ignore */ resolve(ssrOutDir, pathToPageComponentPath(path).slice(1))
         );
         const appHtml = await render(root, path, component, data);
         if (appHtml === null) {
-          console.log(`  skip ${p.replace(/\.html$/, ".md")}`);
+          console.log(`  skip ${mdPath}`);
           continue;
         }
-
         const appHead = headConfigStringify(configToHeadConfig(data));
         const html = template
           .replace("<!--app-html-->", appHtml)
           .replace("<!--app-head-->", appHead);
-        const outPath = pathToOutPath(clientOutDir, path);
 
+        const outPath = resolve(clientOutDir, path.slice(1));
         mkdirSync(dirname(outPath), { recursive: true });
         writeFileSync(outPath, html);
-        console.log(`  ${p.replace(/\.html$/, ".md")} → ${relative(cwd, outPath)}`);
+
+        console.log(`  ${mdPath} → ${relative(cwd, outPath)}`);
       }
 
       rmSync(ssrOutDir, { recursive: true });

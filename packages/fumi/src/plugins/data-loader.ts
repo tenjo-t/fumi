@@ -1,18 +1,39 @@
-import path from "path";
-import type { Plugin } from "vite";
-import { loadConfigFromFile, normalizePath } from "vite";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { type Plugin, loadConfigFromFile, normalizePath } from "vite";
 import { glob } from "tinyglobby";
 import pm from "picomatch";
-import type { DataLoader } from "../content-loader";
-import { createProcessor, MarkdownOptions } from "./markdown";
-import { readFile } from "fs/promises";
 import matter from "gray-matter";
+import type { DataLoader } from "../content-loader";
 import { type FumiConfig, resolveFumiConfig } from "../config";
+import { createProcessor, MarkdownOptions } from "./markdown";
+import { fileToUrl, rewritePath } from "../route";
 
 export function dataLoader(markdownOptions: MarkdownOptions, config: FumiConfig): Plugin {
-  const cache = new Map<string, string>();
   const depToLoaderModuleIdsMap = new Map<string, Set<string>>();
   const idToLoaderModulesMap = new Map<string, DataLoader<unknown>>();
+
+  const processor = createProcessor(markdownOptions);
+  async function loadMarkdown(root: string, file: string) {
+    const src = await readFile(file, "utf-8");
+    const { content, data: frontmatter } = matter(src);
+    const vfile = await processor.process(content);
+
+    const pageConfig: FumiConfig = { ...frontmatter };
+    if (pageConfig.title == null && vfile.data.title != null) {
+      pageConfig.title = vfile.data.title as string;
+    }
+    const resolvedConfig = resolveFumiConfig(config, pageConfig);
+
+    const path = fileToUrl(file, root);
+
+    return {
+      path: rewritePath(config.rewrites, path),
+      isNotFound: false,
+      ...resolvedConfig,
+      frontmatter,
+    };
+  }
 
   return {
     name: "fumi:data-loader",
@@ -37,7 +58,7 @@ export function dataLoader(markdownOptions: MarkdownOptions, config: FumiConfig)
 
           if (!isBuild) {
             for (const dep of res.dependencies) {
-              const depPath = normalizePath(path.resolve(dep));
+              const depPath = normalizePath(resolve(dep));
               let set = depToLoaderModuleIdsMap.get(depPath);
               if (!set) {
                 depToLoaderModuleIdsMap.set(depPath, (set = new Set()));
@@ -61,27 +82,7 @@ export function dataLoader(markdownOptions: MarkdownOptions, config: FumiConfig)
               ignore: ["**/node_modules/**", "**/.fumi/**"],
             })
           ).sort();
-          const processor = createProcessor(markdownOptions);
-          data = await loader.load(watchFiles, async (file) => {
-            const src = await readFile(file, "utf-8");
-            const { content, data: frontmatter } = matter(src);
-            const vfile = await processor.process(content);
-
-            const pageConfig: FumiConfig = { ...frontmatter };
-            if (pageConfig.title == null && vfile.data.title != null) {
-              pageConfig.title = vfile.data.title as string;
-            }
-            const resolvedConfig = resolveFumiConfig(config, pageConfig);
-
-            const path = file.replace(".md", ".html").replace(root, "");
-
-            return {
-              path: config.rewrites?.(path) ?? path,
-              isNotFound: false,
-              ...resolvedConfig,
-              frontmatter,
-            };
-          });
+          data = await loader.load(watchFiles, (file) => loadMarkdown(root, file));
         } else {
           data = await loader.load();
         }

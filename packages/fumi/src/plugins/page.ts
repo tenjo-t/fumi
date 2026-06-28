@@ -1,6 +1,6 @@
+import { statSync } from "node:fs";
+import { resolve } from "node:path";
 import type { Plugin } from "vite";
-import { statSync } from "fs";
-import { resolve } from "path";
 
 export function page(): Plugin[] {
   let root: string;
@@ -15,7 +15,7 @@ export function page(): Plugin[] {
         filter: { id: /^\/__app\/.*\.js(?:\.(?:md|vue))?$/ },
         handler(source) {
           const normalized = source.replace(/\.(?:md|vue)$/, "");
-          const path = normalized.replace(/^\/__app\//, "").replace(/\.js$/, "");
+          const path = normalized.slice(7, -3);
 
           const vuePath = resolve(root, `${path}.vue`);
           if (existsFile(vuePath)) return vuePath;

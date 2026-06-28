@@ -1,6 +1,5 @@
 import type { Plugin } from "vite";
-import { unified } from "unified";
-import type { PluggableList, Plugin as UnifiedPlugin } from "unified";
+import { type PluggableList, type Plugin as UnifiedPlugin, unified } from "unified";
 import type { Root } from "hast";
 import { select } from "hast-util-select";
 import { toText } from "hast-util-to-text";
@@ -10,6 +9,7 @@ import rehypeStringify from "rehype-stringify";
 import matter from "gray-matter";
 import type { PageData } from "../client/data";
 import { type FumiConfig, resolveFumiConfig } from "../config";
+import { fileToUrl, rewritePath } from "../route";
 
 export interface MarkdownOptions {
   /** remark-parse の後に適用する remark プラグイン */
@@ -56,10 +56,10 @@ export function markdown(options: MarkdownOptions, config: FumiConfig): Plugin {
           pageConfig.title = file.data.title as string;
         }
         const resolvedConfig = resolveFumiConfig(config, pageConfig);
-        const path = id.replace("index.md", "index.html").replace(".md", ".html").replace(root, "");
+        const path = rewritePath(config.rewrites, fileToUrl(id, root));
 
         const data: PageData = {
-          path: config.rewrites?.(path) ?? path,
+          path,
           isNotFound: path === "/404.html",
           frontmatter,
           ...resolvedConfig,

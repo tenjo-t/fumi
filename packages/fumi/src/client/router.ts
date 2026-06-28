@@ -60,7 +60,7 @@ export async function loadPage(
     return await import(/* @vite-ignore */ pathToPageComponentPath(pathname));
   } catch (e) {
     if (!(e instanceof TypeError)) throw e;
-    const page = await import(/* @vite-ignore */ "/__app/404.js" as string);
+    const page = await import(/* @vite-ignore */ "/__app/404.js" as string).catch(() => undefined);
     return {
       default: page?.default,
       __pageData: { ...page?.__pageData, url: pathname, isNotFound: true },

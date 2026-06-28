@@ -4,7 +4,7 @@ import { createApp } from "./client/app";
 import type { PageData } from "./client/data";
 
 /** FumiをSSR用にレンダリングする */
-export async function render(root: Component, url: string, component: Component, data: PageData) {
-  const { app } = createApp(root, { path: url, component, data });
+export async function render(root: Component, path: string, component: Component, data: PageData) {
+  const { app } = createApp(root, { path, component, data });
   return await renderToString(app);
 }

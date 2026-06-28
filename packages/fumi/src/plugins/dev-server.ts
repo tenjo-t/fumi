@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { extname, resolve } from "node:path";
 import {
   type Plugin,
   type ViteDevServer,
@@ -5,13 +7,11 @@ import {
   createFilter,
   type RunnableDevEnvironment,
 } from "vite";
-import { readFileSync } from "fs";
-import { resolve } from "path";
 import { pathToPageComponentPath } from "../client/router";
 import type { HeadConfig, FumiConfig } from "../config";
 import { configToHeadConfig } from "../client/config";
 import { headConfigStringify } from "../utils";
-import { rewritesDevServer } from "../route";
+import { cleanUrl, rewritePath, rewritesDevServer } from "../route";
 
 const isCss = createFilter(
   [/\.css(?:$|\?)/],
@@ -50,9 +50,8 @@ async function dev(server: ViteDevServer, config: FumiConfig) {
         if (!req.headers.accept?.includes("text/html")) return next();
         // `.html` 以外の拡張子を持つパス（.css/.js/.vue など）はアセット/モジュール
         // リクエストなので Vite に委ねる。拡張子なし or `.html` はページとして扱う。
-        const pathname = url.split("?")[0];
-        const ext = pathname.slice(pathname.lastIndexOf("/") + 1).match(/\.[^.]+$/)?.[0];
-        if (ext && ext !== ".html") return next();
+        const ext = extname(cleanUrl(url));
+        if (ext !== ".html" && ext !== "") return next();
 
         let html = readFileSync(resolve(fumiRoot, "index.html"), "utf-8");
         // index.html の実際の配信パスを htmlPath として渡すことで、
@@ -63,9 +62,8 @@ async function dev(server: ViteDevServer, config: FumiConfig) {
         const { render } = await import("#ssr");
         const { default: root } = await ssrEnv.runner.import(".fumi/App.vue");
 
-        const pageComponentPath = pathToPageComponentPath(url);
         const { default: component, __pageData } = await ssrEnv.runner
-          .import(pageComponentPath)
+          .import(pathToPageComponentPath(url))
           .catch(async (e) => {
             if (e.code !== "ERR_LOAD_URL") throw e;
 
@@ -76,7 +74,7 @@ async function dev(server: ViteDevServer, config: FumiConfig) {
               default: page?.default,
               __pageData: {
                 ...page?.__pageData,
-                path: config.rewrites?.(url) ?? url,
+                path: rewritePath(config.rewrites, url),
                 isNotFound: true,
               },
             };
