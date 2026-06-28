@@ -7,6 +7,7 @@ import { configToHeadConfig } from "../client/config";
 import { headConfigStringify } from "../utils";
 import type { FumiConfig } from "../config";
 import { collectPages, rewritePath } from "../route";
+import { pathToFileURL } from "node:url";
 
 export function build(config: FumiConfig): Plugin {
   const rewrite = rewritePath.bind(null, config.rewrites);
@@ -91,7 +92,7 @@ export function build(config: FumiConfig): Plugin {
       const template = await readFile(templatePath, "utf-8");
 
       const { render } = await import("#ssr");
-      const { default: root } = await import(resolve(ssrOutDir, "app.js"));
+      const { default: root } = await import(pathToFileURL(resolve(ssrOutDir, "app.js")).href);
 
       console.log("\nRendering pages...");
       for (const p of pages) {
@@ -99,7 +100,9 @@ export function build(config: FumiConfig): Plugin {
         const mdPath = path.replace(/\.html$/, ".md");
 
         const { default: component, __pageData: data } = await import(
-          /* @vite-ignore */ resolve(ssrOutDir, pathToPageComponentPath(path).slice(1))
+          /* @vite-ignore */ pathToFileURL(
+            resolve(ssrOutDir, pathToPageComponentPath(path).slice(1)),
+          ).href
         );
         const appHtml = await render(root, path, component, data);
         if (appHtml === null) {
